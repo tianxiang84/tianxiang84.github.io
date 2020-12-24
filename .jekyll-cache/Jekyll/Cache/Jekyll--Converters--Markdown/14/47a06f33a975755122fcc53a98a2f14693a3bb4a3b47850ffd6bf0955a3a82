@@ -1,0 +1,15 @@
+I"J<ul>
+  <li>Able to
+    <ul>
+      <li>Answer sum query within interval.</li>
+      <li>Update within fixed-size array.</li>
+    </ul>
+  </li>
+  <li>Variant
+    <ul>
+      <li>Answer prefix query of min/max.</li>
+    </ul>
+  </li>
+  <li><a href="https://github.com/misaka-10032/alg/blob/master/alg/tree/bit.py">Code</a></li>
+</ul>
+:ET

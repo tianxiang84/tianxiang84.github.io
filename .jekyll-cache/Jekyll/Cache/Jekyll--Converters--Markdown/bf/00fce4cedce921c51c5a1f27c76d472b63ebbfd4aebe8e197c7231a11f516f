@@ -1,0 +1,2 @@
+I"<p>The previous <a href="https://misaka-10032.github.io/shadow-map/">post</a> introduces the basics of shadow mapping. However, I didn’t mention one of the fundamental problems: <em>aliasing</em>. If we take a closer look at the shadow, we will find it jagged on the edge.</p>
+:ET

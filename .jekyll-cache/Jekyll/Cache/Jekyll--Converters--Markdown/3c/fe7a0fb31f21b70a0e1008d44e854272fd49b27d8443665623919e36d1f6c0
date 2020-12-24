@@ -1,0 +1,167 @@
+I"FM<p>The previous <a href="https://misaka-10032.github.io/shadow-map/">post</a> introduces the basics of shadow mapping. However, I didn’t mention one of the fundamental problems: <em>aliasing</em>. If we take a closer look at the shadow, we will find it jagged on the edge.</p>
+
+<p><img src="/images/20180113/basic-shadow.png" alt="" /></p>
+
+<p>This is a common problem for pre-computed texels: if we had a depth map of infinite resolution, the problem would have been solved. The <em>shadow acne</em> problem is also caused by this, though it could be hidden by applying a small bias. However, we have no luck for aliasing.</p>
+
+<p>A lot of research has been done to mitigate aliasing, and to create soft shadow at the edge to look more realistic, such as Percentage Closer Filtering, Variance Shadow Maps, Moment Shadow Mapping.</p>
+
+<h2 id="percentage-closer-filtering">Percentage Closer Filtering</h2>
+
+<p>This is one of the most fundamental work. For simplicity, I’m only going to walk through a very basic version of it. The idea is intuitive: instead of sampling from a texel that is closest to the true coordinate, sample from a window (e.g. 2x2), and do an average (or weighted average, according to distance).</p>
+
+<p><img src="/images/20180121/pcf-2x2-window.png" alt="" /></p>
+
+<p>Remember the way we sample from the depth texture</p>
+
+<div class="language-glsl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">texture</span><span class="p">(</span><span class="n">uDepth</span><span class="p">,</span> <span class="n">lightCoord</span><span class="p">.</span><span class="n">xy</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Instead of doing this, we sample from a window of texels. For clarity, let’s say <code class="language-plaintext highlighter-rouge">uDepthMapScale</code> is passed in as uniform that is equal to <code class="language-plaintext highlighter-rouge">vec2(1./depthMapWidth, 1./depthMapHeight)</code>. Also we enlarge the window a little bit (4x4) to get fuzzier edges.</p>
+
+<div class="language-glsl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">visibility</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span> <span class="n">y</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">;</span> <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">.)</span> <span class="p">{</span>
+    <span class="kt">float</span> <span class="n">occluderLightDist</span> <span class="o">=</span>
+        <span class="n">texture</span><span class="p">(</span><span class="n">uDepthMap</span><span class="p">,</span> <span class="n">lightCoord</span><span class="p">.</span><span class="n">xy</span> <span class="o">+</span> <span class="n">uDepthMapScale</span> <span class="o">*</span> <span class="kt">vec2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)).</span><span class="n">z</span><span class="p">;</span>
+    <span class="n">visibility</span> <span class="o">+=</span> <span class="n">weight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="kt">float</span><span class="p">(</span><span class="n">fragLightDist</span> <span class="o">&lt;</span> <span class="n">occluderLightDist</span> <span class="o">+</span> <span class="n">kEps</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/images/20180121/pcf-shadow.png" alt="" /></p>
+
+<p>More formally, let’s define $z_f$ as the distance from fragment to light and $z_o$ as the distance from occluder to light. Given a depth window in the view of light, the window of $z_o$’s, let’s say $Z_o$, the visibility of the fragment could be modeled as</p>
+
+\[V(z_f) = W * I(z_f &lt; Z_o)\]
+
+<p>where $W$ is the filter, $*$ is <a href="https://en.wikipedia.org/wiki/Convolution">convolution</a>, and $I$ is <a href="https://en.wikipedia.org/wiki/Indicator_function">indicator function</a>. For example, if we apply a 2x2 average filter on a depth window like this</p>
+
+\[\begin{pmatrix}
+0.2 &amp; 0.2 \\
+0.6 &amp; 0.8
+\end{pmatrix}\]
+
+<p>then $V(z_f)$ would be a multi-step function</p>
+
+<p><img src="/images/20180121/multi-step.png" alt="" /></p>
+
+<p>For $z_f$ that is on the edge of a step, there still might be chance of shadow acne or aliasing.</p>
+
+<h3 id="variance-shadow-maps">Variance Shadow Maps</h3>
+
+<p>Given a pre-computed depth map and a texture coordinate $(x, y)$, the $z_o$ sampled from it is actually an inaccurate one: some information has already been lost due to the finite rasterization. The true $z_o$ is actually a random variable that we don’t know; the convolution we did in PCF is neverthless a good guess based on the continuity nature of the real scene.</p>
+
+<p>However, in PCF we have to apply a convolution kernel per fragment in the shadow pass, which could be expensive if the kernel size is very large. Then someone asks the question: can we pre-compute the convolution in the depth pass, and only sample from one texel in the shadow pass? One of the benefits is that, if the light doesn’t move, in other words, the pre-computed depth map doesn’t change, the shadow pass could be much rendered much faster.</p>
+
+<p>Actually, to sample $z_o$ from a window, we don’t need all the values from it; some statistics about the window might be good enough. In <a href="http://www.punkuser.net/vsm/vsm_paper.pdf">Variance Shadow Maps</a>, the author proposes to collect the first two moments per window in the depth pass, and model the visibility as</p>
+
+\[V(z_o, z_f) = P(z_o \ge z_f) \le \frac{\sigma^2}{\sigma^2 + (z_f - \mu)^2}\]
+
+<p>The inequality is <a href="https://en.wikipedia.org/wiki/Chebyshev%27s_inequality">Chebychev’s inequality</a>. $\mu$ and $\sigma$ could be pre-computed in the depth pass.</p>
+
+\[\mu = E(z_o) \\
+\sigma^2 = E(z_o^2) - E(z_o)^2\]
+
+<p>$z_o$’s are sampled per window, so they could be pre-computed via convolution. For clarity, let’s say the pre-computed result will have each texel being the weighted average of $(z, z^2, 0, 1)$ of a window around it. Given a texel sample, and the fragment-light distance, we can compute the visibility as following</p>
+
+<div class="language-glsl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="nf">computeVisibility</span><span class="p">(</span><span class="kt">vec4</span> <span class="n">depthMapSample</span><span class="p">,</span> <span class="kt">float</span> <span class="n">fragLightDist</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">float</span> <span class="n">mu</span> <span class="o">=</span> <span class="n">depthMapSample</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">mu</span> <span class="o">&gt;</span> <span class="n">fragLightDist</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">.;</span>
+  <span class="p">}</span>
+  <span class="kt">float</span> <span class="n">mu2</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">mu</span><span class="p">;</span>
+  <span class="kt">float</span> <span class="n">sigma2</span> <span class="o">=</span> <span class="n">clamp</span><span class="p">(</span><span class="n">depthMapSample</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">mu2</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e8</span><span class="p">);</span>
+  <span class="kt">float</span> <span class="n">fragOccluderDist</span> <span class="o">=</span> <span class="n">fragLightDist</span> <span class="o">-</span> <span class="n">mu</span><span class="p">;</span>
+  <span class="kt">float</span> <span class="n">fragOccluderDist2</span> <span class="o">=</span> <span class="n">fragOccluderDist</span> <span class="o">*</span> <span class="n">fragOccluderDist</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">sigma2</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma2</span> <span class="o">+</span> <span class="n">fragOccluderDist2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Notice that we applied a trick by early return at <code class="language-plaintext highlighter-rouge">mu &gt; fragLightDist</code>. Otherwise, there will be very bad artifact at fragment where $z_f &lt; z_o$ for real.</p>
+
+<p><img src="/images/20180121/bad-variance-shadow.png" alt="" /></p>
+
+<p>From math, we can easily analyze the side effect of the term $(z_f - \mu)^2$, so to avoid the risk, we simply ignore this term when $z_f &lt; \mu$.</p>
+
+<p><img src="/images/20180121/variance-shadow.png" alt="" /></p>
+
+<p>This method is not perfect neither. Notice that we modeled the visibility as upper bound of $P(z_o \ge z_f)$. The upper bound may not be tight, so there’s chance that the visibility is greater than its true value. The consequence is that some region will be brighter than what it should be, and this artifact is known as <em>Light Bleeding</em>.</p>
+
+<h3 id="moment-shadow-maps">Moment Shadow Maps</h3>
+
+<p>Is it possible to get a closer upper bound given more moments? The answer is yes. In <a href="http://momentsingraphics.de/?page_id=51">Moment Shadow Maps</a>, the author generalizes the problem as <a href="https://en.wikipedia.org/wiki/Hamburger_moment_problem">Hamburger Moment Problem</a>, and gives the following solution with 4 moments.</p>
+
+<ul>
+  <li>Let $b = (z, z^2, z^3, z^4)$</li>
+  <li>Let $b’ = (1 - \alpha) \cdot b + \alpha \cdot (0., .63, 0., .63)^T$, $\alpha = 9 \cdot 10^{-3}$</li>
+  <li>Solve $c$ with Cholesky decomposition</li>
+</ul>
+
+\[\begin{pmatrix}
+  1 &amp; b_1' &amp; b_2' \\
+  b_1' &amp; b_2' &amp; b_3' \\
+  b_2' &amp; b_3' &amp; b_4'
+\end{pmatrix}
+\cdot c =
+\begin{pmatrix}
+  1 \\ z_f \\ z_f^2
+\end{pmatrix}\]
+
+<ul>
+  <li>Solve $d_1 \le d_2$ for</li>
+</ul>
+
+\[c_3 \cdot d^2 + c_2 \cdot d + c_1 = 0\]
+
+<ul>
+  <li>Compute visibility given $z_f$, $b’$, $d$.</li>
+</ul>
+
+\[V = \begin{cases}
+  1 &amp;, z_f \le d_1 \\
+  1 - \frac{z_f d_2 - b_1'(z_f + d_2) + b_2'}{(d_2 - d_1)(z_f - d_1)} &amp;, d_1 &lt; z_f \le d_2 \\
+  \frac{d_1 d_2 - b_1' (d_1 + d_2) + b_2'}{(z_f - d_1) (z_f - d_2)} &amp;, z_f &gt; d_2
+\end{cases}\]
+
+<div class="language-glsl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="nf">computeVisibility</span><span class="p">(</span><span class="kt">vec4</span> <span class="n">depthMapSample</span><span class="p">,</span> <span class="kt">float</span> <span class="n">fragLightDist</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">float</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">9e-3</span><span class="p">;</span>
+  <span class="kt">vec4</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">.</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">depthMapSample</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="kt">vec4</span><span class="p">(</span><span class="mi">0</span><span class="p">.,</span> <span class="p">.</span><span class="mi">63</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">.</span><span class="mi">63</span><span class="p">);</span>
+  <span class="kt">mat3</span> <span class="n">B</span> <span class="o">=</span> <span class="kt">mat3</span><span class="p">(</span>
+      <span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">y</span><span class="p">,</span>
+      <span class="n">b</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">z</span><span class="p">,</span>
+      <span class="n">b</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">w</span><span class="p">);</span>
+  <span class="kt">float</span> <span class="n">zf</span> <span class="o">=</span> <span class="n">fragLightDist</span><span class="p">;</span>
+  <span class="kt">vec3</span> <span class="n">z</span> <span class="o">=</span> <span class="kt">vec3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">zf</span><span class="p">,</span> <span class="n">zf</span> <span class="o">*</span> <span class="n">zf</span><span class="p">);</span>
+  <span class="kt">vec3</span> <span class="n">c</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span><span class="p">;</span>
+  <span class="kt">float</span> <span class="n">sqrtDelta</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">c</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span><span class="p">.</span> <span class="o">*</span> <span class="n">c</span><span class="p">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">c</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+  <span class="kt">float</span> <span class="n">d1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">c</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">sqrtDelta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="p">.</span> <span class="o">*</span> <span class="n">c</span><span class="p">.</span><span class="n">z</span><span class="p">);</span>
+  <span class="kt">float</span> <span class="n">d2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">c</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">sqrtDelta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="p">.</span> <span class="o">*</span> <span class="n">c</span><span class="p">.</span><span class="n">z</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">d2</span> <span class="o">&lt;</span> <span class="n">d1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">float</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">d1</span><span class="p">;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">d2</span><span class="p">;</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">zf</span> <span class="o">&lt;=</span> <span class="n">d1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">.;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">zf</span> <span class="o">&lt;=</span> <span class="n">d2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">.</span> <span class="o">-</span> <span class="p">(</span><span class="n">zf</span> <span class="o">*</span> <span class="n">d2</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">zf</span> <span class="o">+</span> <span class="n">d2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">d2</span> <span class="o">-</span> <span class="n">d1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zf</span> <span class="o">-</span> <span class="n">d1</span><span class="p">));</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">d1</span> <span class="o">*</span> <span class="n">d2</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">d1</span> <span class="o">+</span> <span class="n">d2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">zf</span> <span class="o">-</span> <span class="n">d1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zf</span> <span class="o">-</span> <span class="n">d2</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/images/20180121/moment-shadow.png" alt="" /></p>
+
+<h3 id="quantization">Quantization</h3>
+
+<p>TODO</p>
+
+<h2 id="reference">Reference</h2>
+
+<ul>
+  <li><a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/">Tutorial</a> on shadow mapping.</li>
+  <li>GPU Gems <a href="https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch11.html">tutorial</a> on Percentage Closer Filtering.</li>
+  <li><a href="http://www.punkuser.net/vsm/vsm_paper.pdf">Paper</a> on Variance Shadow Maps.</li>
+  <li><a href="http://momentsingraphics.de/?page_id=51">Lecture</a> on Moment Shadow Mapping.</li>
+</ul>
+:ET
