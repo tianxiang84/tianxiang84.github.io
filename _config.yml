@@ -9,7 +9,7 @@ name: Tianxiang Su
 description: Research Scientist at Schlumberger
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: https://avatars3.githubusercontent.com/u/26549148?s=400&u=2870b32aa539b2a1a1fd9989d2a7fbfc49c3a426&v=4
+avatar: images/about/IMG_20170703_115739.jpg
 
 #
 # Flags below are optional
@@ -17,13 +17,13 @@ avatar: https://avatars3.githubusercontent.com/u/26549148?s=400&u=2870b32aa539b2
 
 # Includes an icon in the footer for each username you enter
 footer-links:
-  dribbble:
-  email: su.tianxiang@gmail.com
-  facebook:
-  flickr:
-  github: tianxiang84
-  instagram:
   linkedin: tianxiang-su-89ba812b
+  github: tianxiang84
+  facebook: su.tianxiang
+  dribbble:
+  email:
+  flickr:
+  instagram:
   pinterest:
   rss: # just type anything here for a working RSS icon
   twitter: # tianxiangsu
