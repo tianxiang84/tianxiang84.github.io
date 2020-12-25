@@ -1,2 +1,0 @@
-I"-<p>Having learnt an object file has <code class="language-plaintext highlighter-rouge">.text</code> section for code, <code class="language-plaintext highlighter-rouge">.data</code> section for data, <code class="language-plaintext highlighter-rouge">.bss</code> section for uninitialized data, and so on and so forth, it’s still unclear how it’s mapped into a real ELF file. How an elf file can represent these informations? Through <code class="language-plaintext highlighter-rouge">objdump</code>, we may peek into the content of these sections.</p>
-:ET
