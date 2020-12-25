@@ -1,5 +1,6 @@
 ---
-layout: default
+layout: post
+comments: true
 ---
 
 <div class="posts">
