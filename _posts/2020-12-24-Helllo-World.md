@@ -3,4 +3,4 @@ layout: post
 title: "Hello World"
 ---
 
-This blog is created using Jekyll.
+Thanks for visiting this site. I created it using Jekyll.
