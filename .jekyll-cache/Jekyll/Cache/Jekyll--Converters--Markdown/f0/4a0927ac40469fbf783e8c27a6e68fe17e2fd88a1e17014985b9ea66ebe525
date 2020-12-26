@@ -1,16 +1,0 @@
-I"�<h2 id="background">Background</h2>
-<p>I’ve been working with Professor Y. Marzouk and his postdoc P. Rubio on a Schlumberger project for the past year. One interesting technique I learnt from them is the so-called transport map. It is not about how to fit all MBTA routes onto an A4 paper, although everytime I saw the MBTA map on a bus I wonder if there is any math behind the design of that map. The transport map I learnt during the past year is about how to represent a complex probability distribution. Without sharing any Schlumberger related things, this post tries to document my understanding of the basics of transport maps.</p>
-
-<h2 id="what-transport-maps-can-do-for-us">What Transport Maps Can Do for Us</h2>
-<p>Imagine the following scenario. We know $x$ is a random variable that follows a standard Gaussian distribution. There is a complex function (maybe the function is only available numerically) $y=f(x)$ that transforms any given $x$ to a scalar $y$. What can we say about the distribution $P(y)$? Apparently one can sample a lot of $x$, pass them to the function $f$ to generate samples of $y$, then use statistics to describe the $y$ samples. This is great. But sometimes we may want to get an analytical expression for $P(y)$, or in some cases we are only given some samples of $y$ without any knowledge of $x$ and $f$ but we want to have a machinary to keep generating new samples of $y$ that minic the given samples. Transport maps can help.</p>
-
-<p>Another scenario transport maps can help is when we are given a un-normalized distribution (maybe only numerically, i.e., if you give me a value $x$, I can tell you $P(x) \sim h(x)$ where $h$ doesn’t have an analytical expression but can be computed numerically following some procedure). Transport map can help us construct a normalized distribution and subsequently draw samples from it.</p>
-
-<h2 id="how-transport-maps-work">How Transport Maps Work</h2>
-<p>A transport map is a transform between a reference distribution and a targe distribution. We can use any simple distribution we like as our reference distribution and the target distribution is the one that we want to disribe. The map is parametrized. The goal is to optimize those parameters so that after the transformation, the obtained target distribution matches any information we have about the target distribution. At the end of the day, finding a transport map becomes a loss minimization problem for parameter optimization.</p>
-
-<p>Let’s say we are given some samples of $y$. First thing we do is to pick a reference distribution we like. Say a standard normal distribution $P(x)~N(0,1)$. Then we define a parametrized map $y=f_\theta(x)$. Here $\theta$ are the parameters we will need to</p>
-
-<h2 id="references">References</h2>
-<p>1.Marzouk, Y., Moselhy, T., Parno, M. &amp; Spantini, A. An introduction to sampling via measure transport. arXiv:1602.05023 [math, stat] 1–41 (2016) doi:10.1007/978-3-319-11259-6_23-1.</p>
-:ET

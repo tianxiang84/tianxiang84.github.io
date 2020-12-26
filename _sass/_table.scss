@@ -1,10 +1,11 @@
 table {
-  padding: 0; }
+  padding: 0;
+  vertical-align: middle; }
   table tr {
     border-top: 1px solid #cccccc;
     background-color: white;
     margin: 0;
-    padding: 0; }
+    padding: 0;}
     table tr:nth-child(2n) {
       background-color: #f8f8f8; }
     table tr th {
@@ -16,9 +17,12 @@ table {
       border: 1px solid #cccccc;
       text-align: left;
       margin: 0 auto;
-      padding: 6px 13px; }
+      padding: 6px 13px; 
+      vertical-align: middle; }
     table tr th :first-child, table tr td :first-child {
-      margin-top: 0; }
+      margin-top: 0;
+      vertical-align: middle;  }
     table tr th :last-child, table tr td :last-child {
-      margin-bottom: 0; }
+      margin-bottom: 0;
+      vertical-align: middle;  }
 
