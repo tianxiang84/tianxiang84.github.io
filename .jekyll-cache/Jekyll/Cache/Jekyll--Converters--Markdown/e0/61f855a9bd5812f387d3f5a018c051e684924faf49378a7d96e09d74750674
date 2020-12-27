@@ -1,0 +1,34 @@
+I"ÿ<div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/On-Transport-Maps/">On Transport Maps</a></h1>
+
+      
+      <div class="entry">
+        <h2 id="background">Background</h2>
+<!--more-->
+<p>Iâ€™ve been working with Professor Y. Marzouk and his postdoc P. Rubio on a Schlumberger project for the past year. One interesting technique I learnt from them is the so-called transport map. It is not about how to fit all MBTA routes onto an A4 paper, although everytime I saw the MBTA map on a bus I wonder if there is any math behind the design of that map. The transport map I learnt during the past year is about how to represent a complex probability distribution. Without sharing any Schlumberger related things, this post tries to document my understanding of the basics of transport maps (all have been published by Marzouk earlier, see ref.1 for example).</p>
+
+      </div>
+
+      <a href="/On-Transport-Maps/" class="read-more">Read More</a>
+
+    </article>
+  
+    <article class="post">
+
+      <h1><a href="/Helllo-World/">Hello World</a></h1>
+
+      
+      <div class="entry">
+        <p>Thanks for visiting this site. I created it using Jekyll.</p>
+
+      </div>
+
+      <a href="/Helllo-World/" class="read-more">Read More</a>
+
+    </article>
+  
+</div>
+:ET

@@ -1,0 +1,92 @@
+I"®<div class="posts">
+  
+    <article class="post">
+
+      <h1><a href="/On-Transport-Maps/">On Transport Maps</a></h1>
+
+      
+        <div>
+          <h2 id="background">Background</h2>
+
+        </div>
+        <input type="checkbox" class="read-more-state" id="/posts/" />
+        <div class="read-more-1">
+          ' | last }}
+        </div>
+        <label for="{{ page.url }}" class="read-more-trigger"></label>
+      {% else %}
+        {{ page.content }}
+      {% endif %}
+
+
+      <div class="entry">
+        {{ post.excerpt }}
+      </div>
+
+      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+
+    </article>
+  {% endfor %}
+</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    &lt;/div&gt;
+    &lt;label for="/posts/" class="read-more-trigger"&gt;&lt;/label&gt;
+  
+
+
+  &lt;div class="entry"&gt;
+    &lt;h2 id="background"&gt;Background&lt;/h2&gt; &lt;!--more--&gt;
+</code></pre></div></div>
+<p>Iâ€™ve been working with Professor Y. Marzouk and his postdoc P. Rubio on a Schlumberger project for the past year. One interesting technique I learnt from them is the so-called transport map. It is not about how to fit all MBTA routes onto an A4 paper, although everytime I saw the MBTA map on a bus I wonder if there is any math behind the design of that map. The transport map I learnt during the past year is about how to represent a complex probability distribution. Without sharing any Schlumberger related things, this post tries to document my understanding of the basics of transport maps (all have been published by Marzouk earlier, see ref.1 for example).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  &lt;/div&gt;
+
+  &lt;a href="/On-Transport-Maps/" class="read-more"&gt;Read More&lt;/a&gt;
+
+&lt;/article&gt;
+  
+&lt;article class="post"&gt;
+
+  &lt;h1&gt;&lt;a href="/Helllo-World/"&gt;Hello World&lt;/a&gt;&lt;/h1&gt;
+
+  
+    &lt;div class="posts"&gt;   {% for post in site.posts %}
+&lt;article class="post"&gt;
+
+  &lt;h1&gt;&lt;a href="{{ site.baseurl }}{{ post.url }}"&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+
+  {% if post.content contains '&lt;!--more--&gt;' %}
+    &lt;div&gt;
+      {{ post.content | split:'&lt;!--more--&gt;' | first }}
+    &lt;/div&gt;
+    &lt;input type="checkbox" class="read-more-state" id="{{ page.url }}"/&gt;
+    &lt;div class="read-more-1"&gt;
+      {{ page.content | split:'&lt;!--more--&gt;' | last }}
+    &lt;/div&gt;
+    &lt;label for="{{ page.url }}" class="read-more-trigger"&gt;&lt;/label&gt;
+  {% else %}
+    {{ page.content }}
+  {% endif %}
+
+
+  &lt;div class="entry"&gt;
+    {{ post.excerpt }}
+  &lt;/div&gt;
+
+  &lt;a href="{{ site.baseurl }}{{ post.url }}" class="read-more"&gt;Read More&lt;/a&gt;
+
+&lt;/article&gt;   {% endfor %}
+</code></pre></div></div>
+<p>&lt;/div&gt;</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  &lt;div class="entry"&gt;
+    &lt;p&gt;Thanks for visiting this site. I created it using Jekyll.&lt;/p&gt;
+
+  &lt;/div&gt;
+
+  &lt;a href="/Helllo-World/" class="read-more"&gt;Read More&lt;/a&gt;
+
+&lt;/article&gt;
+</code></pre></div></div>
+
+<p>&lt;/div&gt;</p>
+:ET

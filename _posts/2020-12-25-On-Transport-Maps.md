@@ -4,8 +4,10 @@ title: "On Transport Maps"
 ---
 
 ## Background
-I've been working with Professor Y. Marzouk and his postdoc P. Rubio on a Schlumberger project for the past year. One interesting technique I learnt from them is the so-called transport map. It is not about how to fit all MBTA routes onto an A4 paper, although everytime I saw the MBTA map on a bus I wonder if there is any math behind the design of that map. The transport map I learnt during the past year is about how to represent a complex probability distribution. Without sharing any Schlumberger related things, this post tries to document my understanding of the basics of transport maps (all have been published by Marzouk earlier, see ref.1 for example).
+I've been working with Professor Y. Marzouk and his postdoc P. Rubio on a Schlumberger project for the past year. One interesting technique I learnt from them is the so-called transport map. 
+It is not about how to fit all MBTA routes onto an A4 paper, although everytime I saw the MBTA map on a bus I wonder if there is any math behind the design of that map. The transport map I learnt during the past year is about how to represent a complex probability distribution. Without sharing any Schlumberger related things, this post tries to document my understanding of the basics of transport maps (all have been published by Marzouk earlier, see ref.1 for example).
 
+<!--more-->
 ## What Transport Maps Can Do for Us
 Imagine the following scenario. We know $x$ is a random variable that follows a standard Gaussian distribution. There is a complex function (maybe the function is only available numerically) $y=f(x)$ that transforms any given $x$ to a scalar $y$. What can we say about the distribution $P(y)$? Apparently one can sample a lot of $x$, pass them to the function $f$ to generate samples of $y$, then use statistics to describe the $y$ samples. This is great. But sometimes we may want to get an analytical expression for $P(y)$, or in some cases we are only given some samples of $y$ without any knowledge of $x$ and $f$ but we want to have a machinary to keep generating new samples of $y$ that minic the given samples. Transport maps can help.
 
