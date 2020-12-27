@@ -1,6 +1,5 @@
 ---
 layout: page
-title: Some Random Writings <hr><hr>
 comments: true
 ---
 
