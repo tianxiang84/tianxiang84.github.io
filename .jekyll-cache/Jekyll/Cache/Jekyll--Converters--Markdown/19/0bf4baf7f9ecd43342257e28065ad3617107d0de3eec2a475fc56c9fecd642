@@ -1,0 +1,39 @@
+I"�<table>
+  <thead>
+    <tr>
+      <th><img src="/images/about/2018-09-29 150216.jpg" width="500" height="180" /></th>
+      <th>My name is Tianxiang Su (<a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Su_(surname)">苏</a><a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Tian">天</a><a target="_blank" rel="noopener noreferrer" href="https://www.purpleculture.net/dictionary-details/?word=%E7%BF%94">翔</a>).</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="/images/about/Schlumberger_06.jpg" width="500" height="120" /></td>
+      <td>I am a Research Scientist at <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Schlumberger">Schlumberger-Doll Research Center</a> in Cambridge, Massachusetts. I’ve been here since October 2013.</td>
+    </tr>
+    <tr>
+      <td><img src="/images/about/Deformed.png" width="500" height="120" /></td>
+      <td>I have been doing projects in the areas of computational mechanics, vision-guided industrial robot pick and place, deep-learning based computer vision and more recently real-time system parameter inference using Bayesian inference.</td>
+    </tr>
+    <tr>
+      <td><img src="/images/about/Harvard_Wreath_Logo_1.svg" width="500" height="120" /></td>
+      <td>Before joining Schlumberger, I was a post-doctoral researcher in the School of Engineering and Applied Sciences at Harvard University from 2011 to 2013. I was co-advised by <a target="_blank" rel="noopener noreferrer" href="https://bertoldi.seas.harvard.edu/">Dr. Katia Bertoldi</a> (Harvard) and <a target="_blank" rel="noopener noreferrer" href="https://www.epfl.ch/labs/flexlab/">Dr. Pedro M. Reis</a> (MIT).</td>
+    </tr>
+    <tr>
+      <td><img src="/images/about/penn.gif" width="500" height="120" /></td>
+      <td>I did my Ph.D. study in the Department of Mechanical Engineering and Applied Mechanics at University of Pennsylvania from 2007 to 2011. My advisor is Dr. Prashant K. Purohit.</td>
+    </tr>
+    <tr>
+      <td><img src="/images/about/Thwlc.jpg" width="500" height="120" /></td>
+      <td>I studied solid mechanics and biophysics when I was at UPenn. My Ph.D. thesis discusses the mechanics of floppy polymer filament networks: how they deform under Brownian motion and external applied forces.</td>
+    </tr>
+    <tr>
+      <td><img src="/images/about/200px-Peking_University_seal.svg.png" width="500" height="130" /></td>
+      <td>I was an undergraduate student in Peking University from 2003-2007, majored in Theoretical and Applied Mechanics. My undergraduate thesis discusses the mechanics of an enzyme called $\alpha$-lytic. My supervisor is Dr. Huaiqiu Zhu.</td>
+    </tr>
+    <tr>
+      <td><img src="/images/about/guangzhou.jpg" width="500" height="150" /></td>
+      <td>I grew up in the city of Guangzhou in south China before I moved to attend college in Beijing.</td>
+    </tr>
+  </tbody>
+</table>
+:ET

@@ -1,5 +1,6 @@
 ---
 layout: post
+title: Some Random Writings
 comments: true
 ---
 
