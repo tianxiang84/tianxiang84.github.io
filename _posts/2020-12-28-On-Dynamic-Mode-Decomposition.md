@@ -17,19 +17,19 @@ Let's first talk about the data fed into the DMD algorithm. Denote $\vec{x}=[x_1
 \end{equation}
 
 Naturally, one would think that if we could do an "inverse" of the $n \times m$ matrix $\textbf{X}$ so that $\textbf{A} = \textbf{X}' \textbf{X}^{-1}$, then mission is accomplished. This is indeed a valid thought and SVD (singular value decomposition) can help us perform the psudo inverse. The problem is that when we have a large $n$, computing the $n \times n$ matrix $\textbf{A}$ becomes expensive, not to mention that subsequently we may need to further compute some properties of the system by manipulating $\textbf{A}$. DMD gave us a procedure to find $\textbf{A}$ efficiently.
-Since the main issue is that we may have large $n$, let's imagine we have a magic solution to reduce the order of the system so that:
+
+Since the main issue is that we may have a large $n$, let's imagine we have a magic solution to reduce the order of the system so that:
 \begin{equation}
 \vec{x} = \textbf{U} \vec{y}.
 \end{equation}
 Here $\textbf{U}$ is a $n \times r$ matrix, and $\vec{y}$, our magic new state with less degrees of freedom, is a $r \times 1$ vector with $r < n$.
 
-Assuming we know how to compute $\textbf{U}$ so that the reduced order $\vec{y}$ still captures most of the infomration stored in $\vec{x}$, then in the reduced $y$ space, the $r \times r$ linear transformation matrix $\textbf{A}_y$ should be less expensive to compute:
+Assuming we know how to compute $\textbf{U}$ so that the reduced order $\vec{y}$ still captures most of the infomration stored in $\vec{x}$, then in the reduced $y$ space, the $r \times r$ linear transformation matrix $\textbf{A}_y$ should be less expensive to compute from data (i.e., transform all $\vec{x}$ into $\vec{y}$ then perform psudo inverse):
 \begin{equation}
 \textbf{Y}' = \textbf{A}_y \textbf{Y}.
 \end{equation}
-And later we can recover our real $\textbf{A}$ using $\textbf{U}^T \textbf{A}_y \textbf{U}$.
 
-The final trick is decouple the linear system by another transform. This is a classical eigen problem exercise, we will find a tranform $\textbf{W}$:
+The final trick is decouple the linear system by another linear transform. This is a classical eigen problem exercise, we will need find a tranform $\textbf{W}$ between $\vec{y}$ and a new state $\vec{z}$ (also of order $r$):
 \begin{equation}
 \vec{y} = \textbf{W} \vec{z},
 \end{equation}
@@ -41,12 +41,12 @@ Here $\textbf{A}_z$ is a $r \times r$ diagonal matrix. In the $z$ space, the dec
 \begin{equation}
 z_i(t) = \exp \left(\lambda_i t \right) z_i(0).
 \end{equation}
-Here $i=1,2,\cdots,r$.
+Here $i=1,2,\cdots,r$ and $\lambda_i$ are the complex-value eigen values.
 
-To summarize, we need to do two transforms, one from $\vec{x}$ to $\vec{y}$, followed by a second one from $\vec{y}$ to $\vec{z}$, to find the simple dynamics that matches the data. Note the "matching" is achieved when we compute $\textbf{A}_y$. Then we revert those transforms to predict how $X$ will evolve.
+To summarize, to reduce a high-dimensional data set to simple dynamics, one need to do two transforms, one from $\vec{x}$ to $\vec{y}$, followed by a second one from $\vec{y}$ to $\vec{z}$. Note that data matching is achieved when we compute $\textbf{A}_y$. Then we revert those transforms to predict how $\vec{x}$ will evolve.
 
 ### The Unexplained Magic Step
-I have left the "magic" step on transforming $\vec{x}$ to $\vec{y}$ unexplained above. This order reducing step can be achieved by using SVD decomposition of the $\textbf{X}$ matrix. 
+I have left the "magic" step on transforming $\vec{x}$ to $\vec{y}$ unexplained above. This order reducing step can be achieved by using SVD decomposition of the $\textbf{X}$ matrix. It has been explained in the book (ref. 1) in earlier sessions.
 
 ### Reference
 1.Brunton, S. L. & Kutz, J. N. Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control. (Cambridge University Press, 2019). doi:10.1017/9781108380690.
