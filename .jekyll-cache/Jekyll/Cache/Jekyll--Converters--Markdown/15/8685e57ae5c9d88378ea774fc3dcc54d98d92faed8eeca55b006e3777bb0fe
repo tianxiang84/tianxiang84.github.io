@@ -1,0 +1,12 @@
+I"<h3 id="background">Background</h3>
+<p>I bought a book on data-driven dynamical system earlier this year right before the pandemic spread in the US (ref. 1). The book was writen by two Professors at University of Washington and was published quite recently. It talks about dynamical systems, but instead of focusing on the classical theories that we learnt in school, it focuses more on how data can help us identify and reduce the order of the systems. This post summarizes my understanding on the Dynamic Mode Decomposition (DMD) method after reading Session 7.2 of the book.</p>
+
+<!--more-->
+<h3 id="what-dmd-does">What DMD Does</h3>
+<p>DMD essentially tries to learn the dynamics of a system using data without equations and physics. Not like deep learning however,</p>
+
+<h3 id="how-dmd-works">How DMD Works</h3>
+
+<h2 id="reference">Reference</h2>
+<p>1.Brunton, S. L. &amp; Kutz, J. N. Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control. (Cambridge University Press, 2019). doi:10.1017/9781108380690.</p>
+:ET
