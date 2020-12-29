@@ -1,0 +1,49 @@
+I"7<h3 id="background">Background</h3>
+<p>I bought a book on data-driven dynamical systems (ref. 1) earlier this year right before the pandemic began to spread across the US. The book was writen by two professors from University of Washington and was published quite recently in 2019. The book talks about dynamical systems, but instead of focusing on the classical theories that we learnt in school, it focuses more on how data can help us identify and reduce the order of the systems. Session 7.2 of the book introduces a method named “Dynamic Mode Decomposition” (DMD. I find it interesting because, essentially, the method enables us to use data to discover, characterize and predict how a dynamical system evolves. More importantly the characterization could be done in low order (i.e., with few degrees of freedom), which means if the data is from a high fidelity model, the method gives us a way to produce a reduced order model. This post summarizes my current high-level understanding of DMD after reading Session 7.2 of the book. Here I will not cite the papers already cited in the book, if interested, please look up the original research papers from the book.</p>
+
+<!--more-->
+<h3 id="what-dmd-does">What DMD Does</h3>
+<p>DMD tries to learn a linear dynamical system from data and efficiently predict its behavior. Unlike training a deep learning neural network, however, DMD aims to do the “learning” efficiently. The data fed into the DMD algorithm are pairs of the state of a system separated by a small time interval $\Delta t$, for example, snapshots of the system at $t=10.0$s and $t=10.1$s. By digesting these pairs of “before and after” states, DMD learns how the system evolves in the time period of $\Delta t$. And if you know how a linear system changes in small $\Delta t$, you can predict its state at any time after an initial state is given. Note that here no physical law is used, we rely totally on data, although the data itself can be from some high-fidelity simulator that uses physics.</p>
+
+<h3 id="how-dmd-works">How DMD Works</h3>
+<p>Let’s first talk about the data fed into the DMD algorithm. Let $\vec{x}=[x_1, x_2, \cdots, x_n]^T$ be the state of a $n$-degrees-of-freedom dynamical system. Note that it is a column vector. We select a few, say $m$, snapshots of this system at different time and arrange these column vectors into a matrix $\textbf{X} = [\vec{x}(t_1), \vec{x}(t_2), \cdots, \vec{x}(t_m)]$. For each snapshot, we also get the state of the system after a time delay $\Delta t$, and arrange these states in a second matrix: $\textbf{X}’ = [\vec{x}(t_1+\Delta t), \vec{x}(t_2+\Delta t), \cdots, \vec{x}(t_m+\Delta t)]$. Now we would like to find a linear dynamical system such that:
+\begin{equation}
+\textbf{X}’ = \textbf{A} \textbf{X}.
+\end{equation}
+Here $\textbf{A}$ is a linear transformation that maps a column in $\textbf{X}$ to a corresponding column in $\textbf{X}’$.</p>
+
+<p>Naturally, one would think that if we could do an “inverse” of the $n \times m$ matrix $\textbf{X}$ so that $\textbf{A} = \textbf{X}’ \textbf{X}^{-1}$, then our mission is accomplished. This is indeed a valid thought and SVD (singular value decomposition) can help us perform the psudo inverse. The problem is that when we have a large $n$, computing the $n \times n$ matrix $\textbf{A}$ becomes expensive, not to mention that later we may need to further compute some properties of the system by manipulating $\textbf{A}$ so we can efficiently predict the long-time evolution of the system. DMD gave us a procedure to find $\textbf{A}$ efficiently.</p>
+
+<p>Since the main issue is that we may have a large $n$, let’s imagine we have a magic solution to reduce the order of the system so that:
+\begin{equation}
+\vec{x} = \textbf{U} \vec{y}.
+\end{equation}
+Here $\textbf{U}$ is a $n \times r$ matrix, and $\vec{y}$, our magic new state with less degrees of freedom, is a $r \times 1$ vector with $r &lt; n$.</p>
+
+<p>Assuming we know how to compute $\textbf{U}$ so that the reduced order $\vec{y}$ still captures most of the infomration stored in $\vec{x}$, then in the reduced $y$ space, the $r \times r$ linear transformation matrix $\textbf{A}_y$ should be less expensive to compute from data (i.e., transform all $\vec{x}$ into $\vec{y}$ then perform psudo inverse):
+\begin{equation}
+\textbf{Y}’ = \textbf{A}_y \textbf{Y}.
+\end{equation}</p>
+
+<p>The final trick is decouple the linear system by another linear transform. This is a classical eigen problem exercise, we will need find a tranform $\textbf{W}$ between $\vec{y}$ and a new state $\vec{z}$ (also of order $r$):
+\begin{equation}
+\vec{y} = \textbf{W} \vec{z},
+\end{equation}
+so that 
+\begin{equation}
+\textbf{Z}’ = \textbf{A}_z \textbf{Z}.
+\end{equation}
+Here $\textbf{A}_z$ is a $r \times r$ diagonal matrix. In the $z$ space, the decoupled variables evolve following:
+\begin{equation}
+z_i(t) = \exp \left(\lambda_i t \right) z_i(0).
+\end{equation}
+Here $i=1,2,\cdots,r$ and $\lambda_i$ are the complex-value eigen values.</p>
+
+<p>To summarize, to reduce a high-dimensional data set to simple dynamics, one need to do two transforms, one from $\vec{x}$ to $\vec{y}$, followed by a second one from $\vec{y}$ to $\vec{z}$. Note that data matching is achieved when we compute $\textbf{A}_y$. Then we revert those transforms to predict how $\vec{x}$ will evolve.</p>
+
+<h3 id="the-unexplained-magic-step">The Unexplained Magic Step</h3>
+<p>I have left the “magic” step on transforming $\vec{x}$ to $\vec{y}$ unexplained above. This order reducing step can be achieved by using SVD decomposition of the $\textbf{X}$ matrix. It has been explained in the book (ref. 1) in earlier sessions.</p>
+
+<h3 id="reference">Reference</h3>
+<p>1.Brunton, S. L. &amp; Kutz, J. N. Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control. (Cambridge University Press, 2019). doi:10.1017/9781108380690.</p>
+:ET
