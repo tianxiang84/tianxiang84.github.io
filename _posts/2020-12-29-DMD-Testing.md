@@ -43,6 +43,9 @@ In this session, we will use SVD to find a space with reduced order ($r=2$ is as
 
 <pre>
   <code class="matlab">
+    X = X(:,1:5:end);
+    Xp = Xp(:,1:5:end);
+
     [U, Sigma, V] = svd(X,'econ');
     r = 2;
     Ur = U(:,1:r);
