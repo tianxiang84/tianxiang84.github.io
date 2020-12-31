@@ -1,3 +1,0 @@
-I"þ<h3 id="goal-and-overview">Goal and Overview</h3>
-<p>In this exercise, I would like to create a toy problem to test the Dynamic Mode Decomposition (DMD) algorithm. In particular, I will first use a perfect 2D dynamical system to generate some noisy 3D data. I will then feed the noisy 3D data into DMD and see if I can recover the true 2D dynamics. The code below is written in MATLAB. I created the toy problem myself and have modified the original DMD codes in ref 1 to make it work for the toy problem.</p>
-:ET

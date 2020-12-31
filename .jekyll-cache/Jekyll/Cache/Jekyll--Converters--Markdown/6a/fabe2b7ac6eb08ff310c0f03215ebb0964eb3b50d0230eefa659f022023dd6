@@ -1,0 +1,3 @@
+I"ª<h3 id="goal-and-overview">Goal and Overview</h3>
+<p>In this exercise, I would like apply the Dynamic Mode Decomposition (DMD) algorithm on a simple problem to familiarize myself with DMD. I will first generate the evolution history of a oscillating 2D linear dynamical system. I will then embed the 2D dynamics into a 3D space (put a planar curve into a 3D space) and corrupt the 3D signal with noise. The noisy 3D data will be fed into the DMD algorithm. I want to see if I can recover the true 2D dynamics from the corrupted 3D signal. The code below is written in MATLAB. I created the toy problem myself and modified the DMD codes in ref 1 to make it work for the problem.</p>
+:ET

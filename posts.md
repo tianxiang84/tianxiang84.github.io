@@ -13,6 +13,12 @@ comments: true
          Written on {{ post.date | date: "%B %e, %Y" }}
       </div>
 
+      <div class="date">
+         {% if post.last_modified_at %}
+            Last updated on {{ post.last_modified_at | date: "%B %e, %Y" }}
+         {% endif %}
+      </div>
+
       {% if post.content contains '<!--more-->' %}
         <div>
           {{ post.content | split:'<!--more-->' | first }}
