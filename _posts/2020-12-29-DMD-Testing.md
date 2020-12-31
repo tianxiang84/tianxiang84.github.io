@@ -133,8 +133,9 @@ In this session, we will use Single Value Decomposition (SVD) to find a reduced 
 \begin{equation}
 \textbf{X} = \textbf{U} \Sigma \textbf{V}^*
 \end{equation}
-Here $\textbf{V}^*$ is the complex conjugate inverse of $\textbf{V}$. Also in this exercise the reduced order $r=2$ is assumed to be known. Ref. 1 gives a procedure to determine the optimal reduced order for general problems. I want to focus on the DMD algorithm here so will take a shortcut to assume that $r=2$ is known.
+Here the column vectors of the matrix $\textbf{U}$ are the new basis vectors, ranked such that the elements $\Sigma_{ii}$ in the diagonal matrix $\Sigma$ are in descending order. $\textbf{V}^*$ is the complex conjugate inverse of $\textbf{V}$. In this exercise the reduced order $r=2$ is assumed to be known so we only take the first two columns from $\textbf{U}$. Ref. 1 gives a procedure to determine the optimal reduced order for general problems. I want to focus on the DMD algorithm here so will take a shortcut to assume that $r=2$ is known.
 
+The MATLAB code below calculates $\textbf{U}$, $\Sigma$ and $\textbf{V}$ from the input matrix $\textbf{X}$.
 <pre>
   <code class="matlab">
     [U, Sigma, V] = svd(X,'econ');
@@ -144,57 +145,81 @@ Here $\textbf{V}^*$ is the complex conjugate inverse of $\textbf{V}$. Also in th
     Vr = V(:,1:r);
   </code>
 </pre>
-Note here the subspace is determined by $\textbf{X}$ and has nothing to do with the other input matrix $\textbf{X}'$. If you check the matrix $\textbf{Ur}$, you will find SVD correctly gets the reduced state space for us. On my computer (will be different for different random noise), the $\textbf{Ur}$ matrix is:
+Note here the reduced order subspace is determined by $\textbf{X}$ and has nothing to do with the other input matrix $\textbf{X}'$. If you check the matrix $\textbf{Ur}$, you will find SVD correctly gets the reduced state space for us. On my computer (will be different for different random noise), the $3 \times 2$ $\textbf{Ur}$ matrix is:
 <pre>
   <code class="matlab">
     Ur = [-0.7075, 0.7067; -0.7067, -0.7075; -0.0002, -0.0001];
   </code>
 </pre>
-So the two axes are $\pm 45$ degrees on the $x_1$ and $x_2$ plane. Next we will need to learn the dynamics from data in this reduced space.
+So the two axes are $\pm 45$ degrees on the $x_1$ and $x_2$ plane (Fig. 3). Next we will need to learn the dynamics from data in the reduced space spanned by these two vectors.
+
+<figure>
+  <img src="/images/DMD/DMD_raw_data2.png">
+  <figcaption>Fig.3 - SVD finds the 2D space (spanned by the two red vectors) that contains most information of the 3D signal.</figcaption>
+</figure>
+
 
 ### Step 2 of DMD: Find the Dynamics in the Reduced Order Space
-We will use SVD to learn the 2D dynamics in the reduced space.
+We will use SVD to learn the 2D dynamics in the reduced space. In this step, the input matrix $\textbf{X}'$ will be used.
 <pre>
   <code class='matlab'>
   Atilde = Ur'*Xp*Vr/Sigmar;
   </code>
 </pre>
-Here $\tilde{A}$ represents the learnt linear dynamics in the reduced order space, i.e., we learn from the input data that the evolution in the $y$ space is best approximated by $\vec{y}' = \tilde{A} \vec{y}$, or in a discrete setting, the $k$ step of the evolution is best approximated by $\vec{y}(k) = \tilde{A}^{k-1} \vec{y}(0)$. To check the quality of the learning, in the plot below, the raw input data points, projected on the $y$ space, are shown as dots, and the learnt dynamics is shown in a black curve. I can see on the first period, the learnt dynamics matches with the data quite well. But due to numeric error, i.e., $\text{det}(\tilde{A})$ is slightly less than $1.0$, in subsequent periodes, our trajectory begins to shrink (the black curve is spiraling inward). For real-life problems, this may not be an issue because most likely we will have some damping and so the real part of the eigen values won't be exactly $1.0$.
+Here $\tilde{A}$ represents the learnt linear dynamics in the reduced order space, i.e., we learn from the input data that the evolution in the $y$ space is best approximated by $\vec{y}_{i+1} = \tilde{A} \vec{y}_i$. To check the quality of the learning, in the plot below, the raw input data points, projected on the $y$ space, are shown as dots, and the learnt dynamics is shown in a black curve. I can see on the first period, the learnt dynamics matches with the data quite well. But due to numeric error, i.e., $\text{det}(\tilde{A})$ is slightly less than $1.0$, in subsequent periodes, our trajectory begins to shrink (the black curve is spiraling inward). For real-life problems, this may not be an issue because most likely we will have some damping and so the real part of the eigen values won't be exactly $1.0$.
 <figure>
   <img src="/images/DMD/DMD_reduced_dym.png">
   <figcaption>Fig.3 - The black curve shows a few periods of the learnt dynamics of the system. It is spiraling inwards towards.</figcaption>
 </figure>
 
+### Step 3 of DMD: Analytic Prediction of the Dynamics
+Now we will do the eigen calculation on the learnt $\tilde{A}$.
 <pre>
   <code class='matlab'>
   [West, Lambda] = eig(Atilde);
   </code>
 </pre>
 
-### Step 3 of DMD: Recover the 3D Signal Using the 2D Dynamics
+In the eigen space, the predicted 2D dynamics is:
+\begin{equation}
+\vec{z}(i) = \Lambda^i \vec{z}(0).
+\end{equation}
+Written in continuous time:
+\begin{equation}
+\vec{z}(t) = \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \vec{z}(0) 
+\end{equation}
+
+The dynamics for $\vec{y}$ is:
+\begin{equation}
+\vec{y}(t) = \left\[ \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \right\] \vec{y}(0) 
+\end{equation}
+
+The dynamics for $\vec{x}$ is:
+\begin{equation}
+\vec{x}(t) = \left\[ \textbf{U} \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \textbf{U}' \right\] \vec{x}(0) 
+\end{equation}
+
+The MATLAB code for the dynamics prediction is shown below.
 <pre>
   <code class='matlab'>
-  Phi = Xp*(Vr/Sigmar)*West;
-  alpha1 = Sigmar*Vr(1,:)';
-  b = (West*Lambda)\alpha1;
-  
-  nc = 100;
-  Xest = zeros(3,nc);
-  for i=1:1:100
-    Xest(:,i) = Phi*(Lambda^(i-1))*b;
-  end
+predX = [];
+for time=0:0.01:5
+    predX = [predX, real(Ur*West*diag(exp(time*log(diag(Lambda))/0.005)) * inv(West) * Ur' * X(:,1))];
+end
+figure(h1);
+plot3(predX(1,:),predX(2,:),predX(3,:),'g-','LineWidth',2.0); hold on;
   </code>
 </pre>
 
-### Step 4 of DMD: Plotting the Results
-<pre>
-  <code class='matlab'>
-  figure;
-  plot3(X(1,:),X(2,:),X(3,:),'bo'); hold on;
-  plot3(Xest(1,:),Xest(2,:),Xest(3,:),'k-','LineWidth',2.0); hold on;
-  </code>
-</pre>
-If you run the entire code, you will find we succesfully recover a smooth 3D curve using a learnt 2D dynamics. Noise is removed and the 3D data set is digested into a 2D dynamical system.
+If you run the entire code, you will find we succesfully recover the underlying 2D dynamics from the noisy 3D data.
+
+### Conclusion
+From a set of noisy 3D data (note the DMD algorithm knows nothing about the physics that generates the data), we used DMD above to obtain a reduced order model such that the dynamics can be predicted analytically using a simple formula:
+\begin{equation}
+\vec{x}(t) = \left\[ \textbf{U} \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \textbf{U}' \right\] \vec{x}(0).
+\end{equation}
+
+For this example, the result looks trivial, but the DMD algorithm is impressive and is indeed a powerful tool for creating reduced-order models from data (say those obtained from high-fidelity models).
 
 ### Reference
 1.Brunton, S. L. & Kutz, J. N. Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control. (Cambridge University Press, 2019). doi:10.1017/9781108380690.

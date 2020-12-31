@@ -35,7 +35,7 @@ Here $\textbf{A}_y = \textbf{U}^* \textbf{A} \textbf{U}$ is a definition.
 
 Assuming we know how to compute $\textbf{U}$ so we can convert our data from the $\vec{x}$ to the $\vec{y}$ space, then computing $\textbf{A}_y$ should be a "cheaper" operation. Since $\textbf{A}_y$ and $\textbf{A}$ are related, by learning $\textbf{A}_y$ from data, we also obtain $\textbf{A}$. 
 
-One benefit of obtaining a linear dynamical system is that we could decouple it to efficiently predict its long-time evolution. Decoupling the $n \times n$ $\textbf{A}$ matrix is expensive, but the lower order $\textbf{A}_y$ could help. As a classical eigen problem exercise, the next step is to find a tranform $\textbf{W}$ between $\vec{y}$ and a new state $\vec{z}$ (also of order $r$):
+One benefit of obtaining a linear dynamical system is that we could "decouple" it into simpler forms to efficiently predict its long-time evolution. Decoupling the $n \times n$ $\textbf{A}$ matrix is expensive, but the lower order $\textbf{A}_y$ could help. As a classical eigen problem exercise, the next step is to find a tranform $\textbf{W}$ between $\vec{y}$ and a new state $\vec{z}$ (also of order $r$):
 \begin{equation}
 \vec{y} = \textbf{W} \vec{z},
 \end{equation}
