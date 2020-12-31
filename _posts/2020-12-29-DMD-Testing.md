@@ -128,8 +128,12 @@ X = X(:,xIndex);
   </code>
 </pre>
 
-### Step 1: Find the Reduced Order Space
-In this session, we will use SVD to find a reduced order space for the 3D signal. Here the reduced order $r=2$ is assumed to be known. Ref. 1 gives a procedure to determine the optimal order. For this exercise, I want to focus on the DMD algorithm itself so will take a shortcut here.
+### Step 1 of DMD: Find the Reduced Order Space
+In this session, we will use Single Value Decomposition (SVD) to find a reduced order space for the noisy 3D signal:
+\begin{equation}
+\textbf{X} = \textbf{U} \Sigma \textbf{V}^*
+\end{equation}
+Here $\textbf{V}^*$ is the complex conjugate inverse of $\textbf{V}$. Also in this exercise the reduced order $r=2$ is assumed to be known. Ref. 1 gives a procedure to determine the optimal reduced order for general problems. I want to focus on the DMD algorithm here so will take a shortcut to assume that $r=2$ is known.
 
 <pre>
   <code class="matlab">
@@ -140,31 +144,34 @@ In this session, we will use SVD to find a reduced order space for the 3D signal
     Vr = V(:,1:r);
   </code>
 </pre>
-Note here the subspace is determined by $\textbf{X}$ and has nothing to do with the matrix $\textbf{X}'$. If you check the matrix $\textbf{Ur}$, you will find SVD correctly get the reduced state space for us. For me, the $\textbf{Ur}$ matrix is:
+Note here the subspace is determined by $\textbf{X}$ and has nothing to do with the other input matrix $\textbf{X}'$. If you check the matrix $\textbf{Ur}$, you will find SVD correctly gets the reduced state space for us. On my computer (will be different for different random noise), the $\textbf{Ur}$ matrix is:
 <pre>
   <code class="matlab">
     Ur = [-0.7075, 0.7067; -0.7067, -0.7075; -0.0002, -0.0001];
   </code>
 </pre>
-Next we will need to learn the dynamics from data in this reduced space.
+So the two axes are $\pm 45$ degrees on the $x_1$ and $x_2$ plane. Next we will need to learn the dynamics from data in this reduced space.
 
-### Step 2: Find the Dynamics in the Reduced Order Space
-We will use SVD to learn the 2D dynamics in the learnt reduced space.
+### Step 2 of DMD: Find the Dynamics in the Reduced Order Space
+We will use SVD to learn the 2D dynamics in the reduced space.
 <pre>
   <code class='matlab'>
   Atilde = Ur'*Xp*Vr/Sigmar;
+  </code>
+</pre>
+Here $\tilde{A}$ represents the learnt linear dynamics in the reduced order space, i.e., we learn from the input data that the evolution in the $y$ space is best approximated by $\vec{y}' = \tilde{A} \vec{y}$, or in a discrete setting, the $k$ step of the evolution is best approximated by $\vec{y}(k) = \tilde{A}^{k-1} \vec{y}(0)$. To check the quality of the learning, in the plot below, the raw input data points, projected on the $y$ space, are shown as dots, and the learnt dynamics is shown in a black curve. I can see on the first period, the learnt dynamics matches with the data quite well. But due to numeric error, i.e., $\text{det}(\tilde{A})$ is slightly less than $1.0$, in subsequent periodes, our trajectory begins to shrink (the black curve is spiraling inward). For real-life problems, this may not be an issue because most likely we will have some damping and so the real part of the eigen values won't be exactly $1.0$.
+<figure>
+  <img src="/images/DMD/DMD_reduced_dym.png">
+  <figcaption>Fig.3 - The black curve shows a few periods of the learnt dynamics of the system. It is spiraling inwards towards.</figcaption>
+</figure>
+
+<pre>
+  <code class='matlab'>
   [West, Lambda] = eig(Atilde);
   </code>
 </pre>
-Here $\tilde{A}$ represents the linear dynamics in the reduced order space, i.e., we learn from the data that the $y$ state evolves as $\vec{y}' = \tilde{A} \vec{y}$, or the $k$ step is $\vec{y}(k) = \tilde{A}^{k-1} \vec{y}(0)$. In the plot below, the projected raw data on the $y$ space is shown as dots, and the learnt dynamics is shown in a black curve. I can see on the first period, the learnt dynamics matches with the data quite well. But due to numeric error ($\text{det}(\textbf{A})$ is slightly less than $1.0$), in subsequent periodes, our trajectory begins to shrink.
-<img src="/images/DMD/DMD_reduced_dym.png">
 
-The Schur decomposition helps us find the eigen vectors and values for this 2D dynamics.
-
-
-
-
-### Step 3: Recover the 3D Signal Using the 2D Dynamics
+### Step 3 of DMD: Recover the 3D Signal Using the 2D Dynamics
 <pre>
   <code class='matlab'>
   Phi = Xp*(Vr/Sigmar)*West;
@@ -179,7 +186,7 @@ The Schur decomposition helps us find the eigen vectors and values for this 2D d
   </code>
 </pre>
 
-### Step 4: Plotting the Results
+### Step 4 of DMD: Plotting the Results
 <pre>
   <code class='matlab'>
   figure;
