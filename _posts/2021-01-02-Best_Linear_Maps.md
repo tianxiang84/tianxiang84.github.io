@@ -29,10 +29,16 @@ Now here is the thing that I did not have a clear understanding before: if we pl
 \end{equation}
 The left hand side is what we want to get (the square), while the right hand side is the best we can achieve by a linear transformation from a circle.
 
+I am still having a hard time 'seeing' the geometry behind the right hand side of above equation. One thing is clear, each transformed point can be expressed as:
+\begin{equation}
+\vec{y}_i = \sum_j <\vec{v}_i \vec{v}_j> \vec{x}'_j.
+\end{equation}
+Here $\vec{y}_i$ is a point that the best approximation a point on the square $\vec{x}'_i$. We can see it is obtained by some kind of average across all the points on the square. $\vec{v}_i$ is the normalized coordinates of the points on the circle in the new basis of $\textbf{U}$. 
+
 ### Plots
-In the plot below, the red dots are the circle points, the blue are the square points. The black dots are the results of applying the best linear transform on the red that tries to match with the blue. No surprise it is another circle. This transformed circle can be created by either $\textbf{X}' \textbf{V} \Sigma^{-1} \textbf{U}' \textbf{X}$, or simply $\textbf{X}' \textbf{V} \textbf{V}'$.
+In the plot below, the blue dots are the circle points, the red are the square points. The black dots are the results of applying the best linear transform on the blue that tries to match with the red. No surprise it is another circle. This transformed circle can be created by either $\textbf{X}' \textbf{V} \Sigma^{-1} \textbf{U}' \textbf{X}$, or simply $\textbf{X}' \textbf{V} \textbf{V}'$.
 
 <figure>
   <img src="/images/DMD/mapping.png">
-  <figcaption>Fig.1 - Best linear transformation to map a circle (red) to a square (blue). The best transformation produces the black circle. The approximation is because $\textbf{V} \textbf{V}' \neq \textbf{I}$.</figcaption>
+  <figcaption>Fig.1 - Best linear transformation to map a circle (blue) to a square (red). The best transformation produces the black circle. The approximation is because $\textbf{V} \textbf{V}' \neq \textbf{I}$.</figcaption>
 </figure>
