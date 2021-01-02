@@ -1,0 +1,19 @@
+I"�<h3 id="background">Background</h3>
+<p>I had some confusion on SVD yesterday about when and where we introduce approximation on the DMD algorithm. My thought was that, intuitively, we cannot find an exact linear map to transform one set of points to another random set of points. Because of the randomness, the exact map most likely is nonlinear and nonlocal. But, in the 2nd step of DMD where we learn the linear dynamics from data, when and where do we make an approximation? This exercise was created to clear that confusion.</p>
+
+<h3 id="problem">Problem</h3>
+<p>Let’s imagine a 2D problem. We have a set of points forming a unit circle whose radius is $1.0$. We have another set of points forming a square on the same 2D plane and its size length is $2.0$. Both the circle and the square center at the origin. Clearly we will not be able to find a linear map transforming the circle to a square. But if we try to find the “best” linear map to approximate the square, what shape will we get? Where in the math we introduce the approximation?</p>
+
+<h3 id="analysis">Analysis</h3>
+<p>I created a set of 2D points forming the circle and another set forming the squares. Both data are represented by a $2 times m$ matrix where $m$ is the number of points. For the circle, we denote the data matrix as $\textbf{X}$, while for the square, the matrix is $\textbf{X}’$. We want to find the best linear map $\textbf{A}$ such that:
+\begin{equation}
+\textbf{X}’ = \textbf{A} \textbf{X}.
+\end{equation}</p>
+
+<p>We will be using SVD on $\textbf{X}$ so that $\textbf{X} = \textbf{U} \Sigma \textbf{V}’$. So then our best $\textbf{A}$ can be written as:
+\begin{equation}
+\textbf{A} = \textbf{X}’ \textbf{V} \Sigma^{-1} \textbf{U}’.
+\end{equation}</p>
+
+<p>Now here is the thing that I did not have a clear understanding before: if we plug back this $\textbf{A}$ into the transformation, we will not recover $\textbf{X}’$ because $\textbf{V}$</p>
+:ET

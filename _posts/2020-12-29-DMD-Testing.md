@@ -2,7 +2,7 @@
 layout: post
 title: "Testing the DMD Algorithm"
 date:               2020-12-29
-last_modified_at:   2020-12-30
+last_modified_at:   2020-12-31
 ---
 
 ### Problem Description
@@ -196,7 +196,7 @@ The dynamics for $\vec{y}$ is:
 
 The dynamics for $\vec{x}$ is:
 \begin{equation}
-\vec{x}(t) = \left\[ \textbf{U} \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \textbf{U}' \right\] \vec{x}(0) 
+\vec{x}(t) = \left\[ \textbf{U}_r \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \textbf{U}_r' \right\] \vec{x}(0) 
 \end{equation}
 
 The MATLAB code for the dynamics prediction is shown below.
@@ -216,7 +216,7 @@ If you run the entire code, you will find we succesfully recover the underlying 
 ### Conclusion
 From a set of noisy 3D data (note the DMD algorithm knows nothing about the physics that generates the data), we used DMD above to obtain a reduced order model such that the dynamics can be predicted analytically using a simple formula:
 \begin{equation}
-\vec{x}(t) = \left\[ \textbf{U} \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \textbf{U}' \right\] \vec{x}(0).
+\vec{x}(t) = \left\[ \textbf{U}_r \textbf{W} \exp \left[ \left(\log (\Lambda)/ \Delta t\right) t \right] \textbf{W}^{-1} \textbf{U}_r' \right\] \vec{x}(0).
 \end{equation}
 
 For this example, the result looks trivial, but the DMD algorithm is impressive and is indeed a powerful tool for creating reduced-order models from data (say those obtained from high-fidelity models).
