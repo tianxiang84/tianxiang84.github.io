@@ -40,5 +40,5 @@ In the plot below, the blue dots are the circle points, the red are the square p
 
 <figure>
   <img src="/images/DMD/mapping.png">
-  <figcaption>Fig.1 - Best linear transformation to map a circle (blue) to a square (red). The best transformation produces the black circle. The approximation is because $\textbf{V} \textbf{V}' \neq \textbf{I}$.</figcaption>
+  <figcaption>Fig.1 - Best linear transformation to map a circle (blue) to a square (red). The best transformation produces the black circle. The approximation in SVD is due to the fact that $\textbf{V} \textbf{V}' \neq \textbf{I}$.</figcaption>
 </figure>
